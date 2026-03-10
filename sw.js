@@ -1,41 +1,42 @@
-const CACHE_NAME = 'crm-ashqaf-v2';
+const CACHE_NAME = 'crm-ashqaf-cache-v1';
 const urlsToCache = [
+  './',
   './index.html',
   './manifest.json',
-  './icon-192.png',
-  './icon-512.png'
+  './icon-192x192.png',
+  './icon-512x512.png'
 ];
 
-// Proses Install: Menyimpan aset-aset utama ke cache lokal HP
+// Install Service Worker
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        console.log('Membuka cache');
-        return cache.addAll(urlsToCache).catch(err => console.log('Beberapa aset gagal di-cache', err));
+        console.log('Opened cache');
+        return cache.addAll(urlsToCache);
       })
   );
-  self.skipWaiting();
 });
 
-// Proses Fetch: Syarat wajib agar Chrome membuat WebAPK (App Drawer)
+// Fetch dari Cache (Syarat wajib PWA agar terdeteksi bisa diinstal)
 self.addEventListener('fetch', event => {
   event.respondWith(
     caches.match(event.request)
       .then(response => {
-        // Kembalikan dari cache jika ada, jika tidak ambil dari internet
+        // Jika ada di cache, kembalikan. Jika tidak, ambil dari network
         return response || fetch(event.request);
       })
   );
 });
 
-// Proses Activate: Membersihkan cache versi lama
+// Update Service Worker
 self.addEventListener('activate', event => {
+  const cacheWhitelist = [CACHE_NAME];
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
         cacheNames.map(cacheName => {
-          if (cacheName !== CACHE_NAME) {
+          if (cacheWhitelist.indexOf(cacheName) === -1) {
             return caches.delete(cacheName);
           }
         })

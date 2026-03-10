@@ -5,15 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#4f46e5">
     
-    <!-- Tag PWA (Progressive Web App) -->
-    <link rel="manifest" href="manifest.json">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="CRM Ashqaf">
-    <!-- Nanti Anda perlu menambahkan gambar icon-192.png di folder yang sama -->
-    <link rel="apple-touch-icon" href="icon-192.png">
-
+    <!-- PWA Setup -->
+    <link rel="manifest" href="./manifest.json">
+    <link rel="apple-touch-icon" href="./icon-192x192.png">
+    
     <title>Dashboard CRM MASJID ASHQAF</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -94,51 +89,67 @@
         </header>
 
         <main class="flex-grow container mx-auto px-4 py-6">
-            <!-- Filter Tanggal Global -->
-            <div class="bg-white rounded-xl shadow-sm p-4 mb-6 flex flex-col md:flex-row items-center justify-between gap-4 border-l-4 border-indigo-500">
-                <div class="flex items-center gap-2">
-                    <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                    <h3 class="font-bold text-gray-800">Filter Periode</h3>
-                </div>
-                <div class="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
-                    <div class="flex items-center gap-2 w-full sm:w-auto">
-                        <input type="date" id="filter-start" class="border border-gray-300 rounded-lg p-2 text-sm w-full outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-50 text-gray-700">
-                        <span class="text-gray-500 font-medium">s/d</span>
-                        <input type="date" id="filter-end" class="border border-gray-300 rounded-lg p-2 text-sm w-full outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-50 text-gray-700">
+            <!-- KELOMPOK ANALITIK PERIODE (Filter, Ringkasan, Program) -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 mb-8 overflow-hidden">
+                <!-- 1. Filter Tanggal (Header dari Box) -->
+                <div class="p-4 border-b border-gray-200 bg-gray-50 flex flex-col md:flex-row items-center justify-between gap-4 border-l-4 border-indigo-500">
+                    <div class="flex items-center gap-2">
+                        <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        <h3 class="font-bold text-gray-800">Analitik Periode</h3>
                     </div>
-                    <div class="flex gap-2 w-full sm:w-auto">
-                        <button id="btn-apply-filter" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-bold w-full sm:w-auto transition-colors shadow-sm">Terapkan</button>
-                        <button id="btn-reset-filter" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-bold w-full sm:w-auto transition-colors">Reset</button>
+                    <div class="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+                        <div class="flex items-center gap-2 w-full sm:w-auto">
+                            <input type="date" id="filter-start" class="border border-gray-300 rounded-lg p-2 text-sm w-full outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-gray-700">
+                            <span class="text-gray-500 font-medium">s/d</span>
+                            <input type="date" id="filter-end" class="border border-gray-300 rounded-lg p-2 text-sm w-full outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-gray-700">
+                        </div>
+                        <div class="flex gap-2 w-full sm:w-auto">
+                            <button id="btn-apply-filter" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-bold w-full sm:w-auto transition-colors shadow-sm">Terapkan</button>
+                            <button id="btn-reset-filter" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-bold w-full sm:w-auto transition-colors">Reset</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Ringkasan Kartu -->
+                <div class="p-5 border-b border-gray-100 bg-white">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div class="bg-gray-50 rounded-xl p-4 border border-gray-200 border-l-4 border-l-indigo-500">
+                            <p class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-1">Total Penerimaan</p>
+                            <h3 class="text-2xl font-bold text-gray-900" id="stat-total-rp">Rp 0</h3>
+                            <p class="text-xs text-gray-400 mt-2">Akumulasi seluruh transaksi</p>
+                        </div>
+                        <div class="bg-gray-50 rounded-xl p-4 border border-gray-200 border-l-4 border-l-green-500">
+                            <p class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-1">Total Donatur</p>
+                            <h3 class="text-2xl font-bold text-gray-900" id="stat-total-donatur">0 Orang</h3>
+                            <p class="text-xs text-gray-400 mt-2">Terdaftar dalam periode ini</p>
+                        </div>
+                        <div class="bg-gray-50 rounded-xl p-4 border border-gray-200 border-l-4 border-l-blue-500">
+                            <p class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-1">Total Transaksi</p>
+                            <h3 class="text-2xl font-bold text-gray-900" id="stat-total-tx">0 Transaksi</h3>
+                            <p class="text-xs text-gray-400 mt-2">Riwayat donasi masuk</p>
+                        </div>
+                        <div class="bg-gray-50 rounded-xl p-4 border border-gray-200 border-l-4 border-l-orange-500">
+                            <p class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-1">Rata-rata Donasi</p>
+                            <h3 class="text-2xl font-bold text-gray-900" id="stat-avg-rp">Rp 0</h3>
+                            <p class="text-xs text-gray-400 mt-2">Per transaksi secara keseluruhan</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Laporan Program -->
+                <div class="p-5 bg-white">
+                    <h4 class="text-base font-bold text-gray-800 mb-4 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z"></path></svg>
+                        Laporan Program Donasi
+                    </h4>
+                    <div id="dashboard-program-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                        <!-- Data Program akan dirender di sini -->
                     </div>
                 </div>
             </div>
 
-            <!-- Ringkasan Kartu Atas -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                <div class="bg-white rounded-xl shadow-sm p-5 border-l-4 border-indigo-500">
-                    <p class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-1">Total Penerimaan</p>
-                    <h3 class="text-2xl font-bold text-gray-900" id="stat-total-rp">Rp 0</h3>
-                    <p class="text-xs text-gray-400 mt-2">periode waktu ini</p>
-                </div>
-                <div class="bg-white rounded-xl shadow-sm p-5 border-l-4 border-green-500">
-                    <p class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-1">Total Donatur</p>
-                    <h3 class="text-2xl font-bold text-gray-900" id="stat-total-donatur">0 Orang</h3>
-                    <p class="text-xs text-gray-400 mt-2">Terdaftar dalam master data</p>
-                </div>
-                <div class="bg-white rounded-xl shadow-sm p-5 border-l-4 border-blue-500">
-                    <p class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-1">Total Transaksi</p>
-                    <h3 class="text-2xl font-bold text-gray-900" id="stat-total-tx">0 Transaksi</h3>
-                    <p class="text-xs text-gray-400 mt-2">periode waktu ini</p>
-                </div>
-                <div class="bg-white rounded-xl shadow-sm p-5 border-l-4 border-orange-500">
-                    <p class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-1">Rata-rata Donasi</p>
-                    <h3 class="text-2xl font-bold text-gray-900" id="stat-avg-rp">Rp 0</h3>
-                    <p class="text-xs text-gray-400 mt-2">periode waktu ini</p>
-                </div>
-            </div>
-
-            <!-- Kartu Status Kategori -->
-            <div class="bg-white rounded-xl shadow-sm p-5 mb-8">
+            <!-- Kartu Status Kategori (Global - Tidak terpengaruh filter) -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5 mb-8">
                 <div class="flex justify-between items-center mb-4">
                     <h4 class="text-base font-bold text-gray-800">Sebaran Kategori Donatur</h4>
                     <button id="btn-atur-jenuh" title="Atur Batas Hari Jenuh" class="p-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg flex items-center justify-center transition-colors border border-gray-200">
@@ -149,14 +160,6 @@
                     <div class="bg-blue-50 p-3 rounded-lg"><span class="block text-2xl font-bold text-blue-700" id="cat-baru">0</span><span class="text-xs font-semibold text-blue-600 uppercase">Baru</span></div>
                     <div class="bg-green-50 p-3 rounded-lg"><span class="block text-2xl font-bold text-green-700" id="cat-istiqomah">0</span><span class="text-xs font-semibold text-green-600 uppercase">Istiqomah</span></div>
                     <div class="bg-orange-50 p-3 rounded-lg"><span class="block text-2xl font-bold text-orange-700" id="cat-jenuh">0</span><span class="text-xs font-semibold text-orange-600 uppercase">Jenuh</span></div>
-                </div>
-            </div>
-
-            <!-- Laporan Program (Dashboard) -->
-            <div class="bg-white rounded-xl shadow-sm p-5 mb-8">
-                <h4 class="text-base font-bold text-gray-800 mb-4">Laporan Program Donasi</h4>
-                <div id="dashboard-program-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                    <!-- Data Program akan dirender di sini -->
                 </div>
             </div>
 
@@ -182,6 +185,10 @@
                             <input type="search" id="search-input" placeholder="Cari nama, ID, WA, dll..." class="w-full pl-9 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
                             <svg class="w-4 h-4 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                         </div>
+                        <button id="btn-filter-table" title="Filter Tanggal Tabel" class="relative p-2 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-lg flex items-center justify-center transition-colors">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                            <span id="table-filter-indicator" class="hidden absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
+                        </button>
                         <button id="btn-sort" title="Urutkan Data" class="p-2 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-lg flex items-center justify-center transition-colors">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12"></path></svg>
                         </button>
@@ -261,7 +268,7 @@
         let rawDonations = [];
         let rawDonators = {};
         let filteredDonations = [];
-        let allDonatorsData = {}; 
+        let globalDonatorsData = {}; 
         
         // Set default filter ke hari ini
         const getTodayString = () => {
@@ -272,6 +279,9 @@
         
         let filterStartDate = todayDate;
         let filterEndDate = todayDate;
+        
+        let tableFilterStartDate = '';
+        let tableFilterEndDate = '';
         
         // Update input UI dengan tanggal hari ini
         document.getElementById('filter-start').value = filterStartDate;
@@ -361,11 +371,20 @@
             });
         }
 
-        // Fungsi Baru: Menghitung kategori secara GLOBAL (tanpa mempedulikan filter tanggal)
-        function calculateGlobalCategories() {
-            const tempDonators = {};
+        // Fungsi Baru: Memproses data secara GLOBAL (tanpa mempedulikan filter tanggal) untuk tabel
+        function processGlobalData() {
+            globalDonatorsData = {};
             for (const key in rawDonators) {
-                tempDonators[key] = { ...rawDonators[key], donationDates: new Set(), donasiTerakhir: null, maxSingleDonation: 0 };
+                globalDonatorsData[key] = { 
+                    ...rawDonators[key], 
+                    donationDates: new Set(), 
+                    donasiTerakhir: null, 
+                    maxSingleDonation: 0,
+                    totalDonasi: 0,
+                    jumlahTransaksi: 0,
+                    programCounts: {},
+                    lastCS: '-'
+                };
             }
 
             const now = new Date();
@@ -374,11 +393,28 @@
             // Agregasi dari seluruh riwayat donasi (rawDonations)
             rawDonations.forEach(d => {
                 if (!d.idDonatur) return;
-                if (!tempDonators[d.idDonatur]) {
-                    tempDonators[d.idDonatur] = { idDonatur: d.idDonatur, donationDates: new Set(), donasiTerakhir: null, maxSingleDonation: 0 };
+                if (!globalDonatorsData[d.idDonatur]) {
+                    globalDonatorsData[d.idDonatur] = { 
+                        idDonatur: d.idDonatur, 
+                        namaLengkap: d.nama || d.namaLengkap || d.idDonatur,
+                        whatsapp: d.whatsapp,
+                        donationDates: new Set(), 
+                        donasiTerakhir: null, 
+                        maxSingleDonation: 0,
+                        totalDonasi: 0,
+                        jumlahTransaksi: 0,
+                        programCounts: {},
+                        lastCS: '-'
+                    };
                 }
-                const don = tempDonators[d.idDonatur];
+                const don = globalDonatorsData[d.idDonatur];
                 don.donationDates.add(d.tanggal);
+                don.totalDonasi += d.jumlah;
+                don.jumlahTransaksi++;
+                don.lastCS = d.namaCS || '-';
+                
+                const prog = d.program || 'Lainnya';
+                don.programCounts[prog] = (don.programCounts[prog] || 0) + 1;
                 
                 if (!don.donasiTerakhir || d.tanggal > don.donasiTerakhir) {
                     don.donasiTerakhir = d.tanggal;
@@ -388,8 +424,8 @@
                 }
             });
 
-            // Penentuan Kategori
-            Object.values(tempDonators).forEach(d => {
+            // Penentuan Kategori & Program Favorit
+            Object.values(globalDonatorsData).forEach(d => {
                 const gap = d.donasiTerakhir ? Math.ceil(Math.abs(now - new Date(d.donasiTerakhir)) / (1000 * 60 * 60 * 24)) : Infinity;
                 
                 let kategori = 'Baru';
@@ -398,13 +434,14 @@
                 else kategori = 'Istiqomah';
 
                 counts[kategori]++;
-                
-                // Simpan atribut global ke rawDonators
-                if (!rawDonators[d.idDonatur]) {
-                    rawDonators[d.idDonatur] = { idDonatur: d.idDonatur };
+                d.kategori = kategori;
+                d.isPremium = d.maxSingleDonation >= 1000000;
+
+                let favProg = '-'; let maxC = 0;
+                for (const [p, c] of Object.entries(d.programCounts || {})) { 
+                    if (c > maxC) { maxC = c; favProg = p; } 
                 }
-                rawDonators[d.idDonatur].kategori = kategori;
-                rawDonators[d.idDonatur].isPremium = d.maxSingleDonation >= 1000000;
+                d.favoriteProgram = favProg;
             });
 
             // Perbarui UI Kartu Kategori di Dashboard
@@ -414,10 +451,10 @@
         }
 
         function applyFilterAndProcess() {
-            // 1. Hitung dan tetapkan status kategori donatur secara global (seluruh periode)
-            calculateGlobalCategories();
+            // 1. Hitung dan tetapkan status dan data global donatur (seluruh periode) untuk TABEL
+            processGlobalData();
 
-            // 2. Filter donasi berdasarkan tanggal untuk analitik nominal dan tabel
+            // 2. Filter donasi berdasarkan tanggal untuk analitik nominal CARD ATAS saja
             filteredDonations = rawDonations;
             if (filterStartDate) {
                 filteredDonations = filteredDonations.filter(d => d.tanggal >= filterStartDate);
@@ -425,61 +462,31 @@
             if (filterEndDate) {
                 filteredDonations = filteredDonations.filter(d => d.tanggal <= filterEndDate);
             }
-            processData(rawDonators, filteredDonations);
+            processFilteredData(filteredDonations);
         }
 
-        function processData(masterData, donationsData) {
-            const processed = {};
-            // Gunakan spread operator untuk menyalin tanpa merusak properti yang sudah ada
-            for (const key in masterData) {
-                processed[key] = { ...masterData[key], totalDonasi: 0, jumlahTransaksi: 0, donasiTerakhir: null, programCounts: {} };
-            }
-
-            const sortedDonations = [...donationsData].sort((a,b) => new Date(a.tanggal) - new Date(b.tanggal));
-
+        function processFilteredData(donationsData) {
             let globalTotalRp = 0;
-
-            sortedDonations.forEach(d => {
-                if (!d.idDonatur) return;
-                globalTotalRp += d.jumlah;
-                
-                if (!processed[d.idDonatur]) {
-                    processed[d.idDonatur] = { idDonatur: d.idDonatur, namaLengkap: d.nama || d.namaLengkap || d.idDonatur, whatsapp: d.whatsapp, totalDonasi: 0, jumlahTransaksi: 0, programCounts: {}, kategori: 'Baru', isPremium: false };
-                }
-                
-                const donator = processed[d.idDonatur];
-                donator.totalDonasi += d.jumlah;
-                donator.jumlahTransaksi++;
-                donator.donasiTerakhir = d.tanggal;
-                
-                const prog = d.program || 'Lainnya';
-                donator.programCounts[prog] = (donator.programCounts[prog] || 0) + 1;
-                
-                donator.lastCS = d.namaCS || '-';
-            });
-
-            Object.values(processed).forEach(d => {
-                let favProg = '-'; let maxC = 0;
-                for (const [p, c] of Object.entries(d.programCounts || {})) { if (c > maxC) { maxC = c; favProg = p; } }
-                d.favoriteProgram = favProg;
-            });
-
-            allDonatorsData = processed;
-
-            // Update Top Stats
-            document.getElementById('stat-total-rp').textContent = formatCurrency(globalTotalRp);
-            document.getElementById('stat-total-donatur').textContent = `${Object.keys(processed).length} Orang`;
-            document.getElementById('stat-total-tx').textContent = `${donationsData.length} Transaksi`;
-            document.getElementById('stat-avg-rp').textContent = formatCurrency(donationsData.length ? globalTotalRp / donationsData.length : 0);
-
-            // Update Laporan Program Dashboard
+            const uniqueDonators = new Set();
             const progs = {};
+
             donationsData.forEach(d => {
+                globalTotalRp += d.jumlah;
+                if (d.idDonatur) uniqueDonators.add(d.idDonatur);
+                
                 const p = d.program || 'Tanpa Program';
                 if(!progs[p]) progs[p] = { nama: p, total:0, trx:0 };
                 progs[p].total += d.jumlah;
                 progs[p].trx++;
             });
+
+            // Update Top Stats
+            document.getElementById('stat-total-rp').textContent = formatCurrency(globalTotalRp);
+            document.getElementById('stat-total-donatur').textContent = `${uniqueDonators.size} Orang`;
+            document.getElementById('stat-total-tx').textContent = `${donationsData.length} Transaksi`;
+            document.getElementById('stat-avg-rp').textContent = formatCurrency(donationsData.length ? globalTotalRp / donationsData.length : 0);
+
+            // Update Laporan Program Dashboard
             const programData = Object.values(progs).sort((a,b) => b.total - a.total);
             const programContainer = document.getElementById('dashboard-program-list');
             
@@ -548,6 +555,51 @@
         });
 
         function renderTable() {
+            // --- 0. TERAPKAN FILTER TANGGAL KHUSUS TABEL ---
+            let currentDataDonations = rawDonations;
+            if (tableFilterStartDate) {
+                currentDataDonations = currentDataDonations.filter(d => d.tanggal >= tableFilterStartDate);
+            }
+            if (tableFilterEndDate) {
+                currentDataDonations = currentDataDonations.filter(d => d.tanggal <= tableFilterEndDate);
+            }
+            
+            let currentDataDonators = globalDonatorsData;
+            // Jika ada filter tanggal tabel, hitung ulang master data khusus untuk tabel
+            if (tableFilterStartDate || tableFilterEndDate) {
+                const tempDonators = {};
+                currentDataDonations.forEach(d => {
+                    if (!d.idDonatur) return;
+                    if (!tempDonators[d.idDonatur]) {
+                        tempDonators[d.idDonatur] = {
+                            ...globalDonatorsData[d.idDonatur], // pertahankan nama & status kategori global
+                            totalDonasi: 0,
+                            jumlahTransaksi: 0,
+                            donasiTerakhir: null,
+                            programCounts: {}
+                        };
+                    }
+                    const don = tempDonators[d.idDonatur];
+                    don.totalDonasi += d.jumlah;
+                    don.jumlahTransaksi++;
+                    don.lastCS = d.namaCS || '-';
+                    const prog = d.program || 'Lainnya';
+                    don.programCounts[prog] = (don.programCounts[prog] || 0) + 1;
+                    if (!don.donasiTerakhir || d.tanggal > don.donasiTerakhir) {
+                        don.donasiTerakhir = d.tanggal;
+                    }
+                });
+                
+                Object.values(tempDonators).forEach(d => {
+                    let favProg = '-'; let maxC = 0;
+                    for (const [p, c] of Object.entries(d.programCounts)) { 
+                        if (c > maxC) { maxC = c; favProg = p; } 
+                    }
+                    d.favoriteProgram = favProg;
+                });
+                currentDataDonators = tempDonators;
+            }
+
             let data = [];
             let headers = '';
             
@@ -564,7 +616,7 @@
                     <th class="px-6 py-3 text-left font-semibold text-gray-500 uppercase">CS Terlibat</th>
                 </tr>`;
                 
-                data = [...filteredDonations];
+                data = [...currentDataDonations]; 
                 if(term) data = data.filter(d => filterTerm(d.nama) || filterTerm(d.namaLengkap) || filterTerm(d.idDonatur) || filterTerm(d.program));
                 
                 data.sort((a,b) => {
@@ -581,7 +633,7 @@
                     <th class="px-6 py-3 text-left font-semibold text-gray-500 uppercase">Donasi Terakhir</th>
                 </tr>`;
                 
-                data = Object.values(allDonatorsData);
+                data = Object.values(currentDataDonators); 
                 if(term) data = data.filter(d => filterTerm(d.namaLengkap) || filterTerm(d.namaPanggilan) || filterTerm(d.idDonatur) || filterTerm(d.whatsapp));
                 
                 data.sort((a,b) => {
@@ -598,7 +650,7 @@
                     <th class="px-6 py-3 text-left font-semibold text-gray-500 uppercase">Program Favorit</th>
                 </tr>`;
                 
-                data = Object.values(allDonatorsData).filter(d => d.totalDonasi > 0);
+                data = Object.values(currentDataDonators).filter(d => d.totalDonasi > 0); 
                 if(term) data = data.filter(d => filterTerm(d.namaLengkap) || filterTerm(d.idDonatur));
                 
                 data.sort((a,b) => {
@@ -615,7 +667,7 @@
                 </tr>`;
 
                 const css = {};
-                filteredDonations.forEach(d => {
+                currentDataDonations.forEach(d => { 
                     const p = d.namaCS ? `${d.namaCS} ${d.kodeCS ? ' (#'+d.kodeCS+')':''}` : 'Tanpa CS';
                     if(!css[p]) css[p] = { nama: p, total:0, trx:0 };
                     css[p].total += d.jumlah;
@@ -645,7 +697,7 @@
             // --- 3. RENDER DATA YANG SUDAH DIPAGINASI ---
             if (currentView === 'transactions') {
                 tableBody.innerHTML = paginatedData.map(d => {
-                    const don = allDonatorsData[d.idDonatur] || {};
+                    const don = globalDonatorsData[d.idDonatur] || {};
                     const nama = d.namaLengkap || d.nama || d.idDonatur;
                     return `<tr class="hover:bg-gray-50">
                         <td class="px-6 py-3">${d.tanggal}</td>
@@ -715,10 +767,10 @@
 
         // Detail History Global Access
         window.showHistory = function(donatorId) {
-            const donator = allDonatorsData[donatorId];
+            const donator = globalDonatorsData[donatorId];
             if(!donator) return;
             
-            const history = filteredDonations.filter(d => d.idDonatur === donatorId).sort((a,b) => new Date(b.tanggal) - new Date(a.tanggal));
+            const history = rawDonations.filter(d => d.idDonatur === donatorId).sort((a,b) => new Date(b.tanggal) - new Date(a.tanggal));
             const modalContainer = document.getElementById('modal-container');
             const backdrop = document.getElementById('modal-backdrop');
 
@@ -845,6 +897,64 @@
             document.getElementById('btn-increase-font').addEventListener('click', () => applyFontSize(currentFontSize + 1));
         });
 
+        // Event Listener untuk Tombol Filter Tabel
+        document.getElementById('btn-filter-table').addEventListener('click', () => {
+            const modalContainer = document.getElementById('modal-container');
+            const backdrop = document.getElementById('modal-backdrop');
+
+            modalContainer.innerHTML = `
+                <div class="flex justify-between items-center border-b pb-3 mb-4">
+                    <h3 class="text-xl font-bold text-gray-900">Filter Tanggal Tabel</h3>
+                    <button onclick="document.getElementById('modal-backdrop').classList.add('hidden')" class="text-gray-400 hover:text-gray-600">
+                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+                <div class="space-y-4">
+                    <p class="text-sm text-gray-600 mb-2">Pilih rentang tanggal untuk menyaring data khusus pada tabel ini.</p>
+                    <div class="flex flex-col gap-3">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Mulai Tanggal</label>
+                            <input type="date" id="input-table-start" value="${tableFilterStartDate}" class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 outline-none bg-gray-50 text-gray-700">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Sampai Tanggal</label>
+                            <input type="date" id="input-table-end" value="${tableFilterEndDate}" class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 outline-none bg-gray-50 text-gray-700">
+                        </div>
+                    </div>
+                    <div class="flex gap-2 mt-4">
+                        <button id="btn-save-table-filter" class="flex-grow bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-lg transition-colors shadow-sm">Terapkan Filter</button>
+                        <button id="btn-reset-table-filter" class="px-4 bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-2.5 rounded-lg transition-colors shadow-sm">Reset</button>
+                    </div>
+                </div>
+            `;
+            backdrop.classList.remove('hidden');
+            backdrop.classList.add('flex');
+
+            document.getElementById('btn-save-table-filter').addEventListener('click', () => {
+                tableFilterStartDate = document.getElementById('input-table-start').value;
+                tableFilterEndDate = document.getElementById('input-table-end').value;
+                
+                const indicator = document.getElementById('table-filter-indicator');
+                if(tableFilterStartDate || tableFilterEndDate) indicator.classList.remove('hidden');
+                else indicator.classList.add('hidden');
+                
+                currentPage = 1;
+                backdrop.classList.add('hidden');
+                renderTable(); 
+            });
+
+            document.getElementById('btn-reset-table-filter').addEventListener('click', () => {
+                tableFilterStartDate = '';
+                tableFilterEndDate = '';
+                
+                document.getElementById('table-filter-indicator').classList.add('hidden');
+                
+                currentPage = 1;
+                backdrop.classList.add('hidden');
+                renderTable(); 
+            });
+        });
+
         // Event Listener untuk Tombol Sort
         document.getElementById('btn-sort').addEventListener('click', () => {
             const modalContainer = document.getElementById('modal-container');
@@ -914,21 +1024,12 @@
             });
         });
 
-        // Pendaftaran Service Worker untuk PWA (Syarat wajib masuk App Drawer)
+        // Register Service Worker untuk PWA
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                // Mencegah error 'URL protocol not supported' saat dijalankan di Canvas/Lokal
-                if (window.location.protocol === 'http:' || window.location.protocol === 'https:') {
-                    navigator.serviceWorker.register('./sw.js')
-                        .then(registration => {
-                            console.log('Service Worker berhasil didaftarkan dengan scope:', registration.scope);
-                        })
-                        .catch(err => {
-                            console.warn('Pendaftaran Service Worker gagal (Mungkin karena file sw.js tidak ditemukan di lingkungan ini):', err);
-                        });
-                } else {
-                    console.log('Pendaftaran Service Worker dilewati karena lingkungan saat ini tidak menggunakan protokol HTTP/HTTPS.');
-                }
+                navigator.serviceWorker.register('./sw.js')
+                    .then((reg) => console.log('ServiceWorker berhasil didaftarkan. Scope:', reg.scope))
+                    .catch((err) => console.log('ServiceWorker gagal didaftarkan:', err));
             });
         }
 
