@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#4f46e5">
+    
+    <!-- Tag PWA (Progressive Web App) -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="CRM Ashqaf">
+    <!-- Nanti Anda perlu menambahkan gambar icon-192.png di folder yang sama -->
+    <link rel="apple-touch-icon" href="icon-192.png">
+
+    <title>Dashboard CRM MASJID ASHQAF</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
+        .badge { padding: 2px 8px; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; }
+        .badge-baru { background-color: #e0f2fe; color: #0c4a6e; }
+        .badge-istiqomah { background-color: #dcfce7; color: #166534; }
+        .badge-jenuh { background-color: #ffedd5; color: #9a3412; }
+        .badge-blokir { background-color: #4b5563; color: #f9fafb; }
+        .badge-lead { background-color: #e0e7ff; color: #3730a3; }
+        .badge-premium { background-color: #fffbeb; color: #92400e; border: 1px solid #fcd34d; display: inline-flex; align-items: center; gap: 0.25rem; }
+        
+        .loader { border: 4px solid #f3f3f3; border-radius: 50%; border-top: 4px solid #4f46e5; width: 24px; height: 24px; animation: spin 1s linear infinite; display: inline-block; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        .view-switcher-btn { padding: 10px; border-radius: 8px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
+        .view-switcher-btn.active { background-color: #4f46e5; color: white; box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.3); border: 1px solid #4f46e5; }
+        .view-switcher-btn:not(.active) { background-color: white; color: #6b7280; border: 1px solid #d1d5db; }
+        .view-switcher-btn:not(.active):hover { background-color: #f3f4f6; color: #374151; border-color: #9ca3af; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #c7c7cc; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #a0a0a5; }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <!-- UI Login -->
+    <div id="auth-container" class="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-4">
+        <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border-t-4 border-indigo-600">
+            <div class="text-center mb-6">
+                <h2 class="text-3xl font-bold text-indigo-900">Dashboard</h2>
+                <h3 class="text-xl font-semibold text-gray-600 mt-1">CRM Ashqaf</h3>
+                <p class="text-gray-500 text-sm mt-2">Login untuk melihat analitik dan data</p>
+            </div>
+
+            <form id="auth-form" class="space-y-5">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Email Akses</label>
+                    <input type="email" id="auth-email" required class="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none bg-gray-50">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Kata Sandi</label>
+                    <input type="password" id="auth-password" required class="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none bg-gray-50">
+                </div>
+                <button type="submit" id="auth-submit-btn" class="w-full bg-indigo-600 text-white font-bold py-3 rounded-lg hover:bg-indigo-700 transition-colors shadow-md">Masuk ke Dashboard</button>
+            </form>
+            <div id="auth-error" class="hidden mt-4 p-3 bg-red-50 text-red-700 text-sm rounded-lg border border-red-200 text-center font-medium"></div>
+        </div>
+    </div>
+
+    <!-- Aplikasi Utama (Dashboard) -->
+    <div id="app-container" class="hidden min-h-screen flex flex-col">
+        <!-- Header Nav -->
+        <header class="bg-white shadow-sm sticky top-0 z-10">
+            <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <div class="bg-indigo-600 p-2 rounded-lg text-white">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z"></path></svg>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold text-gray-900 leading-tight">Dashboard CRM</h1>
+                        <p class="text-xs text-gray-500 font-medium">Masjid Ashqaf <span id="sync-status" class="text-green-600 ml-2">• Tersinkronisasi</span></p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button id="btn-settings" class="text-gray-500 hover:text-indigo-600 transition-colors p-2 bg-gray-100 hover:bg-indigo-50 rounded-lg border border-transparent hover:border-indigo-200" title="Pengaturan Tampilan">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                    </button>
+                    <button id="logout-btn" class="text-gray-500 hover:text-red-600 transition-colors p-2 bg-gray-100 hover:bg-red-50 rounded-lg border border-transparent hover:border-red-200" title="Keluar">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="flex-grow container mx-auto px-4 py-6">
+            <!-- Filter Tanggal Global -->
+            <div class="bg-white rounded-xl shadow-sm p-4 mb-6 flex flex-col md:flex-row items-center justify-between gap-4 border-l-4 border-indigo-500">
+                <div class="flex items-center gap-2">
+                    <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    <h3 class="font-bold text-gray-800">Filter Periode</h3>
+                </div>
+                <div class="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+                    <div class="flex items-center gap-2 w-full sm:w-auto">
+                        <input type="date" id="filter-start" class="border border-gray-300 rounded-lg p-2 text-sm w-full outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-50 text-gray-700">
+                        <span class="text-gray-500 font-medium">s/d</span>
+                        <input type="date" id="filter-end" class="border border-gray-300 rounded-lg p-2 text-sm w-full outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-50 text-gray-700">
+                    </div>
+                    <div class="flex gap-2 w-full sm:w-auto">
+                        <button id="btn-apply-filter" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-bold w-full sm:w-auto transition-colors shadow-sm">Terapkan</button>
+                        <button id="btn-reset-filter" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-bold w-full sm:w-auto transition-colors">Reset</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ringkasan Kartu Atas -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <div class="bg-white rounded-xl shadow-sm p-5 border-l-4 border-indigo-500">
+                    <p class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-1">Total Penerimaan</p>
+                    <h3 class="text-2xl font-bold text-gray-900" id="stat-total-rp">Rp 0</h3>
+                    <p class="text-xs text-gray-400 mt-2">periode waktu ini</p>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm p-5 border-l-4 border-green-500">
+                    <p class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-1">Total Donatur</p>
+                    <h3 class="text-2xl font-bold text-gray-900" id="stat-total-donatur">0 Orang</h3>
+                    <p class="text-xs text-gray-400 mt-2">Terdaftar dalam master data</p>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm p-5 border-l-4 border-blue-500">
+                    <p class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-1">Total Transaksi</p>
+                    <h3 class="text-2xl font-bold text-gray-900" id="stat-total-tx">0 Transaksi</h3>
+                    <p class="text-xs text-gray-400 mt-2">periode waktu ini</p>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm p-5 border-l-4 border-orange-500">
+                    <p class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-1">Rata-rata Donasi</p>
+                    <h3 class="text-2xl font-bold text-gray-900" id="stat-avg-rp">Rp 0</h3>
+                    <p class="text-xs text-gray-400 mt-2">periode waktu ini</p>
+                </div>
+            </div>
+
+            <!-- Kartu Status Kategori -->
+            <div class="bg-white rounded-xl shadow-sm p-5 mb-8">
+                <div class="flex justify-between items-center mb-4">
+                    <h4 class="text-base font-bold text-gray-800">Sebaran Kategori Donatur</h4>
+                    <button id="btn-atur-jenuh" title="Atur Batas Hari Jenuh" class="p-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg flex items-center justify-center transition-colors border border-gray-200">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                    </button>
+                </div>
+                <div class="grid grid-cols-3 gap-3 text-center">
+                    <div class="bg-blue-50 p-3 rounded-lg"><span class="block text-2xl font-bold text-blue-700" id="cat-baru">0</span><span class="text-xs font-semibold text-blue-600 uppercase">Baru</span></div>
+                    <div class="bg-green-50 p-3 rounded-lg"><span class="block text-2xl font-bold text-green-700" id="cat-istiqomah">0</span><span class="text-xs font-semibold text-green-600 uppercase">Istiqomah</span></div>
+                    <div class="bg-orange-50 p-3 rounded-lg"><span class="block text-2xl font-bold text-orange-700" id="cat-jenuh">0</span><span class="text-xs font-semibold text-orange-600 uppercase">Jenuh</span></div>
+                </div>
+            </div>
+
+            <!-- Laporan Program (Dashboard) -->
+            <div class="bg-white rounded-xl shadow-sm p-5 mb-8">
+                <h4 class="text-base font-bold text-gray-800 mb-4">Laporan Program Donasi</h4>
+                <div id="dashboard-program-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                    <!-- Data Program akan dirender di sini -->
+                </div>
+            </div>
+
+            <!-- Kontrol View dan Tabel -->
+            <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
+                <div class="p-4 border-b bg-gray-50 flex flex-col lg:flex-row justify-between items-center gap-4">
+                    <div class="flex flex-wrap gap-2 w-full lg:w-auto">
+                        <button id="view-transactions-btn" class="view-switcher-btn active" title="Semua Transaksi">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                        </button>
+                        <button id="view-donators-btn" class="view-switcher-btn" title="Master Donatur">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                        </button>
+                        <button id="view-ranking-btn" class="view-switcher-btn" title="Ranking Donatur">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+                        </button>
+                        <button id="view-ranking-cs-btn" class="view-switcher-btn" title="Performa CS">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                        </button>
+                    </div>
+                    <div class="w-full lg:w-auto flex gap-2">
+                        <div class="relative flex-grow lg:w-64">
+                            <input type="search" id="search-input" placeholder="Cari nama, ID, WA, dll..." class="w-full pl-9 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+                            <svg class="w-4 h-4 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                        </div>
+                        <button id="btn-sort" title="Urutkan Data" class="p-2 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-lg flex items-center justify-center transition-colors">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12"></path></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead id="table-head" class="bg-gray-100">
+                            <!-- Header dari JS -->
+                        </thead>
+                        <tbody id="data-table-body" class="bg-white divide-y divide-gray-200 text-sm">
+                            <!-- Data dari JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Footer Tabel (Pagination Info) -->
+                <div class="p-4 border-t bg-gray-50 flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <div class="flex items-center gap-2">
+                        <label for="rows-per-page" class="text-sm text-gray-600 font-medium">Baris per halaman:</label>
+                        <select id="rows-per-page" class="border border-gray-300 rounded-md text-sm p-1.5 focus:ring-indigo-500 focus:border-indigo-500 bg-white text-gray-700">
+                            <option value="5">5</option>
+                            <option value="10" selected>10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select>
+                    </div>
+                    <div class="text-sm text-gray-500 font-medium" id="data-count-info">Menampilkan 0 data</div>
+                    <div class="flex items-center gap-2">
+                        <button id="btn-prev-page" class="px-3 py-1.5 border border-gray-300 rounded-md bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium transition-colors">Sebelumnya</button>
+                        <span id="page-info" class="text-sm text-gray-700 font-medium min-w-[5rem] text-center">Hal 1 dari 1</span>
+                        <button id="btn-next-page" class="px-3 py-1.5 border border-gray-300 rounded-md bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium transition-colors">Selanjutnya</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Riwayat Transaksi (Read Only) -->
+    <div id="modal-backdrop" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden items-center justify-center z-50 p-4">
+        <div id="modal-container" class="bg-white p-6 rounded-xl shadow-xl w-full max-w-lg transform transition-all">
+            <!-- Modal Content -->
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Konfigurasi Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDxoO6csN_27b1kJliUSf1qVC_D9SLBqJ0",
+            authDomain: "crmmasjidashqaf.firebaseapp.com",
+            projectId: "crmmasjidashqaf",
+            storageBucket: "crmmasjidashqaf.firebasestorage.app",
+            messagingSenderId: "472220766810",
+            appId: "1:472220766810:web:4d4b67f5c048eedb54fe63"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        const appId = 'crmmasjidashqaf';
+        
+        // DOM Elements
+        const authContainer = document.getElementById('auth-container');
+        const appContainer = document.getElementById('app-container');
+        const tableBody = document.getElementById('data-table-body');
+        const tableHead = document.getElementById('table-head');
+        const searchInput = document.getElementById('search-input');
+        const dataCountInfo = document.getElementById('data-count-info');
+        const syncStatus = document.getElementById('sync-status');
+        
+        let rawDonations = [];
+        let rawDonators = {};
+        let filteredDonations = [];
+        let allDonatorsData = {}; 
+        
+        // Set default filter ke hari ini
+        const getTodayString = () => {
+            const d = new Date();
+            return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+        };
+        const todayDate = getTodayString();
+        
+        let filterStartDate = todayDate;
+        let filterEndDate = todayDate;
+        
+        // Update input UI dengan tanggal hari ini
+        document.getElementById('filter-start').value = filterStartDate;
+        document.getElementById('filter-end').value = filterEndDate;
+
+        let currentView = 'transactions';
+        let currentPage = 1;
+        let rowsPerPage = parseInt(localStorage.getItem('dashboardRowsPerPage')) || 10;
+        let unsubDonators, unsubDonations;
+        let settingsJenuhThreshold = parseInt(localStorage.getItem('jenuhThreshold')) || 60;
+        
+        // Konfigurasi Urutan (Sorting)
+        let sortConfigs = {
+            'transactions': { key: 'tanggal', order: 'desc' },
+            'donators': { key: 'totalDonasi', order: 'desc' },
+            'ranking': { key: 'totalDonasi', order: 'desc' },
+            'programs': { key: 'total', order: 'desc' },
+            'ranking-cs': { key: 'total', order: 'desc' }
+        };
+
+        const formatCurrency = (amount) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(amount);
+
+        // --- Pengaturan Ukuran Font ---
+        let currentFontSize = parseInt(localStorage.getItem('dashboardFontSize')) || 12; // Default 12px
+        
+        function applyFontSize(size) {
+            if (size < 10) size = 10;
+            if (size > 24) size = 24;
+            currentFontSize = size;
+            document.documentElement.style.fontSize = size + 'px';
+            localStorage.setItem('dashboardFontSize', size);
+            
+            const display = document.getElementById('font-size-display');
+            if (display) display.textContent = size + 'px';
+        }
+        
+        // Terapkan ukuran font saat aplikasi pertama kali dimuat
+        applyFontSize(currentFontSize);
+
+        // Init Auth
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                authContainer.classList.add('hidden');
+                appContainer.classList.remove('hidden');
+                fetchDashboardData();
+            } else {
+                authContainer.classList.remove('hidden');
+                authContainer.classList.add('flex');
+                appContainer.classList.add('hidden');
+                if(unsubDonators) unsubDonators();
+                if(unsubDonations) unsubDonations();
+            }
+        });
+
+        document.getElementById('auth-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('auth-submit-btn');
+            btn.innerHTML = '<div class="loader"></div>';
+            try {
+                await signInWithEmailAndPassword(auth, document.getElementById('auth-email').value, document.getElementById('auth-password').value);
+            } catch (err) {
+                document.getElementById('auth-error').textContent = "Email atau sandi salah.";
+                document.getElementById('auth-error').classList.remove('hidden');
+                btn.textContent = 'Masuk ke Dashboard';
+            }
+        });
+
+        document.getElementById('logout-btn').addEventListener('click', () => signOut(auth));
+
+        // Fetch Data Read Only
+        function fetchDashboardData() {
+            syncStatus.textContent = "• Memuat data...";
+            syncStatus.className = "text-yellow-600 ml-2 animate-pulse";
+
+            const donatorsRef = collection(db, 'artifacts', appId, 'public', 'data', 'donators');
+            const donationsRef = collection(db, 'artifacts', appId, 'public', 'data', 'donations');
+
+            unsubDonators = onSnapshot(donatorsRef, (snap) => {
+                rawDonators = {};
+                snap.docs.forEach(doc => { rawDonators[doc.id] = { id: doc.id, ...doc.data() }; });
+                applyFilterAndProcess();
+            });
+
+            unsubDonations = onSnapshot(donationsRef, (snap) => {
+                rawDonations = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                applyFilterAndProcess();
+            });
+        }
+
+        // Fungsi Baru: Menghitung kategori secara GLOBAL (tanpa mempedulikan filter tanggal)
+        function calculateGlobalCategories() {
+            const tempDonators = {};
+            for (const key in rawDonators) {
+                tempDonators[key] = { ...rawDonators[key], donationDates: new Set(), donasiTerakhir: null, maxSingleDonation: 0 };
+            }
+
+            const now = new Date();
+            const counts = { 'Baru': 0, 'Istiqomah': 0, 'Jenuh': 0 };
+
+            // Agregasi dari seluruh riwayat donasi (rawDonations)
+            rawDonations.forEach(d => {
+                if (!d.idDonatur) return;
+                if (!tempDonators[d.idDonatur]) {
+                    tempDonators[d.idDonatur] = { idDonatur: d.idDonatur, donationDates: new Set(), donasiTerakhir: null, maxSingleDonation: 0 };
+                }
+                const don = tempDonators[d.idDonatur];
+                don.donationDates.add(d.tanggal);
+                
+                if (!don.donasiTerakhir || d.tanggal > don.donasiTerakhir) {
+                    don.donasiTerakhir = d.tanggal;
+                }
+                if (!don.maxSingleDonation || d.jumlah > don.maxSingleDonation) {
+                    don.maxSingleDonation = d.jumlah;
+                }
+            });
+
+            // Penentuan Kategori
+            Object.values(tempDonators).forEach(d => {
+                const gap = d.donasiTerakhir ? Math.ceil(Math.abs(now - new Date(d.donasiTerakhir)) / (1000 * 60 * 60 * 24)) : Infinity;
+                
+                let kategori = 'Baru';
+                if (gap > settingsJenuhThreshold) kategori = 'Jenuh';
+                else if (d.donationDates.size <= 1) kategori = 'Baru';
+                else kategori = 'Istiqomah';
+
+                counts[kategori]++;
+                
+                // Simpan atribut global ke rawDonators
+                if (!rawDonators[d.idDonatur]) {
+                    rawDonators[d.idDonatur] = { idDonatur: d.idDonatur };
+                }
+                rawDonators[d.idDonatur].kategori = kategori;
+                rawDonators[d.idDonatur].isPremium = d.maxSingleDonation >= 1000000;
+            });
+
+            // Perbarui UI Kartu Kategori di Dashboard
+            document.getElementById('cat-baru').textContent = counts['Baru'];
+            document.getElementById('cat-istiqomah').textContent = counts['Istiqomah'];
+            document.getElementById('cat-jenuh').textContent = counts['Jenuh'];
+        }
+
+        function applyFilterAndProcess() {
+            // 1. Hitung dan tetapkan status kategori donatur secara global (seluruh periode)
+            calculateGlobalCategories();
+
+            // 2. Filter donasi berdasarkan tanggal untuk analitik nominal dan tabel
+            filteredDonations = rawDonations;
+            if (filterStartDate) {
+                filteredDonations = filteredDonations.filter(d => d.tanggal >= filterStartDate);
+            }
+            if (filterEndDate) {
+                filteredDonations = filteredDonations.filter(d => d.tanggal <= filterEndDate);
+            }
+            processData(rawDonators, filteredDonations);
+        }
+
+        function processData(masterData, donationsData) {
+            const processed = {};
+            // Gunakan spread operator untuk menyalin tanpa merusak properti yang sudah ada
+            for (const key in masterData) {
+                processed[key] = { ...masterData[key], totalDonasi: 0, jumlahTransaksi: 0, donasiTerakhir: null, programCounts: {} };
+            }
+
+            const sortedDonations = [...donationsData].sort((a,b) => new Date(a.tanggal) - new Date(b.tanggal));
+
+            let globalTotalRp = 0;
+
+            sortedDonations.forEach(d => {
+                if (!d.idDonatur) return;
+                globalTotalRp += d.jumlah;
+                
+                if (!processed[d.idDonatur]) {
+                    processed[d.idDonatur] = { idDonatur: d.idDonatur, namaLengkap: d.nama || d.namaLengkap || d.idDonatur, whatsapp: d.whatsapp, totalDonasi: 0, jumlahTransaksi: 0, programCounts: {}, kategori: 'Baru', isPremium: false };
+                }
+                
+                const donator = processed[d.idDonatur];
+                donator.totalDonasi += d.jumlah;
+                donator.jumlahTransaksi++;
+                donator.donasiTerakhir = d.tanggal;
+                
+                const prog = d.program || 'Lainnya';
+                donator.programCounts[prog] = (donator.programCounts[prog] || 0) + 1;
+                
+                donator.lastCS = d.namaCS || '-';
+            });
+
+            Object.values(processed).forEach(d => {
+                let favProg = '-'; let maxC = 0;
+                for (const [p, c] of Object.entries(d.programCounts || {})) { if (c > maxC) { maxC = c; favProg = p; } }
+                d.favoriteProgram = favProg;
+            });
+
+            allDonatorsData = processed;
+
+            // Update Top Stats
+            document.getElementById('stat-total-rp').textContent = formatCurrency(globalTotalRp);
+            document.getElementById('stat-total-donatur').textContent = `${Object.keys(processed).length} Orang`;
+            document.getElementById('stat-total-tx').textContent = `${donationsData.length} Transaksi`;
+            document.getElementById('stat-avg-rp').textContent = formatCurrency(donationsData.length ? globalTotalRp / donationsData.length : 0);
+
+            // Update Laporan Program Dashboard
+            const progs = {};
+            donationsData.forEach(d => {
+                const p = d.program || 'Tanpa Program';
+                if(!progs[p]) progs[p] = { nama: p, total:0, trx:0 };
+                progs[p].total += d.jumlah;
+                progs[p].trx++;
+            });
+            const programData = Object.values(progs).sort((a,b) => b.total - a.total);
+            const programContainer = document.getElementById('dashboard-program-list');
+            
+            if (programData.length === 0) {
+                programContainer.innerHTML = '<p class="text-sm text-gray-500 italic col-span-full">Tidak ada data program pada periode ini.</p>';
+            } else {
+                programContainer.innerHTML = programData.map(p => `
+                    <div class="border border-gray-200 rounded-lg p-4 bg-gray-50 flex flex-col justify-between hover:shadow-md transition-shadow">
+                        <div>
+                            <h5 class="font-bold text-gray-800 text-sm mb-1 truncate" title="${p.nama}">${p.nama}</h5>
+                            <p class="text-xs text-gray-500">${p.trx} donasi masuk</p>
+                        </div>
+                        <div class="mt-3">
+                            <span class="text-lg font-bold text-indigo-700">${formatCurrency(p.total)}</span>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            syncStatus.textContent = "• Sinkron";
+            syncStatus.className = "text-green-600 ml-2";
+
+            renderTable();
+        }
+
+        // View Switcher Logic
+        const views = ['transactions', 'donators', 'ranking', 'ranking-cs'];
+        views.forEach(v => {
+            const btn = document.getElementById(`view-${v}-btn`);
+            if (btn) {
+                btn.addEventListener('click', (e) => {
+                    document.querySelectorAll('.view-switcher-btn').forEach(b => b.classList.remove('active'));
+                    e.currentTarget.classList.add('active');
+                    currentView = v;
+                    currentPage = 1;
+                    renderTable();
+                });
+            }
+        });
+
+        searchInput.addEventListener('input', () => {
+            currentPage = 1;
+            renderTable();
+        });
+        
+        // Pagination Event Listeners
+        const rowsPerPageSelect = document.getElementById('rows-per-page');
+        rowsPerPageSelect.value = rowsPerPage;
+        rowsPerPageSelect.addEventListener('change', (e) => {
+            rowsPerPage = parseInt(e.target.value);
+            localStorage.setItem('dashboardRowsPerPage', rowsPerPage);
+            currentPage = 1;
+            renderTable();
+        });
+
+        document.getElementById('btn-prev-page').addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                renderTable();
+            }
+        });
+
+        document.getElementById('btn-next-page').addEventListener('click', () => {
+            currentPage++;
+            renderTable();
+        });
+
+        function renderTable() {
+            let data = [];
+            let headers = '';
+            
+            const term = searchInput.value.toLowerCase();
+            const filterTerm = (str) => str && str.toLowerCase().includes(term);
+            const curSort = sortConfigs[currentView];
+
+            // --- 1. SIAPKAN DATA & HEADER BERDASARKAN TAB ---
+            if (currentView === 'transactions') {
+                headers = `<tr>
+                    <th class="px-6 py-3 text-left font-semibold text-gray-500 uppercase">Tanggal</th>
+                    <th class="px-6 py-3 text-left font-semibold text-gray-500 uppercase">Donatur</th>
+                    <th class="px-6 py-3 text-left font-semibold text-gray-500 uppercase">Donasi & Program</th>
+                    <th class="px-6 py-3 text-left font-semibold text-gray-500 uppercase">CS Terlibat</th>
+                </tr>`;
+                
+                data = [...filteredDonations];
+                if(term) data = data.filter(d => filterTerm(d.nama) || filterTerm(d.namaLengkap) || filterTerm(d.idDonatur) || filterTerm(d.program));
+                
+                data.sort((a,b) => {
+                    if (curSort.key === 'tanggal') return curSort.order === 'desc' ? new Date(b.tanggal) - new Date(a.tanggal) : new Date(a.tanggal) - new Date(b.tanggal);
+                    if (curSort.key === 'jumlah') return curSort.order === 'desc' ? b.jumlah - a.jumlah : a.jumlah - b.jumlah;
+                    return 0;
+                });
+
+            } else if (currentView === 'donators') {
+                headers = `<tr>
+                    <th class="px-6 py-3 text-left font-semibold text-gray-500 uppercase">Donatur</th>
+                    <th class="px-6 py-3 text-left font-semibold text-gray-500 uppercase">Status</th>
+                    <th class="px-6 py-3 text-left font-semibold text-gray-500 uppercase">Akumulasi</th>
+                    <th class="px-6 py-3 text-left font-semibold text-gray-500 uppercase">Donasi Terakhir</th>
+                </tr>`;
+                
+                data = Object.values(allDonatorsData);
+                if(term) data = data.filter(d => filterTerm(d.namaLengkap) || filterTerm(d.namaPanggilan) || filterTerm(d.idDonatur) || filterTerm(d.whatsapp));
+                
+                data.sort((a,b) => {
+                    if (curSort.key === 'totalDonasi') return curSort.order === 'desc' ? (b.totalDonasi||0) - (a.totalDonasi||0) : (a.totalDonasi||0) - (b.totalDonasi||0);
+                    if (curSort.key === 'donasiTerakhir') return curSort.order === 'desc' ? new Date(b.donasiTerakhir||0) - new Date(a.donasiTerakhir||0) : new Date(a.donasiTerakhir||0) - new Date(b.donasiTerakhir||0);
+                    return 0;
+                });
+
+            } else if (currentView === 'ranking') {
+                 headers = `<tr>
+                    <th class="px-4 py-3 text-center font-semibold text-gray-500 uppercase">Peringkat</th>
+                    <th class="px-6 py-3 text-left font-semibold text-gray-500 uppercase">Donatur</th>
+                    <th class="px-6 py-3 text-left font-semibold text-gray-500 uppercase">Total Didonasikan</th>
+                    <th class="px-6 py-3 text-left font-semibold text-gray-500 uppercase">Program Favorit</th>
+                </tr>`;
+                
+                data = Object.values(allDonatorsData).filter(d => d.totalDonasi > 0);
+                if(term) data = data.filter(d => filterTerm(d.namaLengkap) || filterTerm(d.idDonatur));
+                
+                data.sort((a,b) => {
+                    if (curSort.key === 'totalDonasi') return curSort.order === 'desc' ? b.totalDonasi - a.totalDonasi : a.totalDonasi - b.totalDonasi;
+                    if (curSort.key === 'jumlahTransaksi') return curSort.order === 'desc' ? b.jumlahTransaksi - a.jumlahTransaksi : a.jumlahTransaksi - b.jumlahTransaksi;
+                    return 0;
+                });
+
+            } else if (currentView === 'ranking-cs') {
+                 headers = `<tr>
+                    <th class="px-6 py-3 text-left font-semibold text-gray-500 uppercase">Kinerja Tim (CS)</th>
+                    <th class="px-6 py-3 text-left font-semibold text-gray-500 uppercase">Total Dana Masuk</th>
+                    <th class="px-6 py-3 text-left font-semibold text-gray-500 uppercase">Jumlah Closing</th>
+                </tr>`;
+
+                const css = {};
+                filteredDonations.forEach(d => {
+                    const p = d.namaCS ? `${d.namaCS} ${d.kodeCS ? ' (#'+d.kodeCS+')':''}` : 'Tanpa CS';
+                    if(!css[p]) css[p] = { nama: p, total:0, trx:0 };
+                    css[p].total += d.jumlah;
+                    css[p].trx++;
+                });
+
+                data = Object.values(css);
+                if(term) data = data.filter(d => filterTerm(d.nama));
+                
+                data.sort((a,b) => {
+                    if (curSort.key === 'total') return curSort.order === 'desc' ? b.total - a.total : a.total - b.total;
+                    if (curSort.key === 'trx') return curSort.order === 'desc' ? b.trx - a.trx : a.trx - b.trx;
+                    return 0;
+                });
+            }
+
+            // --- 2. PAGINATION LOGIC ---
+            const totalItems = data.length;
+            const totalPages = Math.ceil(totalItems / rowsPerPage) || 1;
+            
+            if (currentPage > totalPages) currentPage = totalPages;
+            if (currentPage < 1) currentPage = 1;
+
+            const startIndex = (currentPage - 1) * rowsPerPage;
+            const paginatedData = data.slice(startIndex, startIndex + rowsPerPage);
+
+            // --- 3. RENDER DATA YANG SUDAH DIPAGINASI ---
+            if (currentView === 'transactions') {
+                tableBody.innerHTML = paginatedData.map(d => {
+                    const don = allDonatorsData[d.idDonatur] || {};
+                    const nama = d.namaLengkap || d.nama || d.idDonatur;
+                    return `<tr class="hover:bg-gray-50">
+                        <td class="px-6 py-3">${d.tanggal}</td>
+                        <td class="px-6 py-3 font-medium text-gray-900 cursor-pointer hover:text-indigo-600" onclick="showHistory('${d.idDonatur}')">${don.isPremium?'👑':''} ${nama}<br><span class="text-xs text-gray-500 font-normal">${d.idDonatur}</span></td>
+                        <td class="px-6 py-3"><span class="font-bold text-green-700">${formatCurrency(d.jumlah)}</span><br><span class="text-xs bg-gray-100 border px-1 rounded">${d.program}</span></td>
+                        <td class="px-6 py-3 text-sm text-gray-600">${d.namaCS || '-'} ${d.kodeCS ? ' (#'+d.kodeCS+')' : ''}</td>
+                    </tr>`;
+                }).join('');
+
+            } else if (currentView === 'donators') {
+                tableBody.innerHTML = paginatedData.map(d => {
+                    return `<tr class="hover:bg-gray-50">
+                        <td class="px-6 py-3 font-medium text-gray-900 cursor-pointer hover:text-indigo-600" onclick="showHistory('${d.idDonatur}')">
+                            ${d.isPremium?'👑':''} ${d.sapaan?d.sapaan+' ':''}${d.namaLengkap || d.idDonatur}
+                            <div class="text-xs text-gray-500 font-normal">${d.whatsapp || 'No WA'} • ID: ${d.idDonatur}</div>
+                        </td>
+                        <td class="px-6 py-3">${getCategoryBadge(d.kategori)}</td>
+                        <td class="px-6 py-3 font-bold text-indigo-700">${formatCurrency(d.totalDonasi)}<div class="text-xs text-gray-500 font-normal">${d.jumlahTransaksi}x Transaksi</div></td>
+                        <td class="px-6 py-3 text-sm text-gray-600">${d.donasiTerakhir || '-'}<div class="text-xs">Via: ${d.lastCS || '-'}</div></td>
+                    </tr>`;
+                }).join('');
+
+            } else if (currentView === 'ranking') {
+                tableBody.innerHTML = paginatedData.map((d, i) => {
+                    const globalIndex = startIndex + i;
+                    let badge = `<span class="bg-gray-100 px-2 py-1 rounded text-gray-700 font-bold">${globalIndex+1}</span>`;
+                    if(globalIndex===0) badge='🥇'; if(globalIndex===1) badge='🥈'; if(globalIndex===2) badge='🥉';
+                    return `<tr class="hover:bg-gray-50">
+                        <td class="px-4 py-3 text-center text-xl">${badge}</td>
+                        <td class="px-6 py-3 font-medium text-gray-900 cursor-pointer hover:text-indigo-600" onclick="showHistory('${d.idDonatur}')">${d.namaLengkap || d.idDonatur}</td>
+                        <td class="px-6 py-3"><span class="font-bold text-green-700">${formatCurrency(d.totalDonasi)}</span> <span class="text-xs text-gray-500">(${d.jumlahTransaksi}x)</span></td>
+                        <td class="px-6 py-3 text-sm text-gray-600">${d.favoriteProgram}</td>
+                    </tr>`;
+                }).join('');
+
+            } else if (currentView === 'ranking-cs') {
+                tableBody.innerHTML = paginatedData.map(d => `<tr class="hover:bg-gray-50">
+                    <td class="px-6 py-3 font-bold text-gray-900">${d.nama}</td>
+                    <td class="px-6 py-3 font-bold text-green-700">${formatCurrency(d.total)}</td>
+                    <td class="px-6 py-3 text-sm text-gray-600">${d.trx} transaksi sukses</td>
+                </tr>`).join('');
+            }
+
+            tableHead.innerHTML = headers;
+            
+            // --- Update Pagination UI ---
+            const startDisplay = totalItems === 0 ? 0 : startIndex + 1;
+            const endDisplay = Math.min(startIndex + rowsPerPage, totalItems);
+            dataCountInfo.textContent = `Menampilkan ${startDisplay}-${endDisplay} dari ${totalItems} data`;
+            
+            document.getElementById('page-info').textContent = `Hal ${currentPage} dari ${totalPages}`;
+            document.getElementById('btn-prev-page').disabled = currentPage === 1;
+            document.getElementById('btn-next-page').disabled = currentPage === totalPages;
+            
+            if(data.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-8 text-gray-500 italic">Tidak ada data ditemukan.</td></tr>`;
+            }
+        }
+
+        function getCategoryBadge(category) {
+            switch (category) {
+                case 'Istiqomah': return `<span class="badge badge-istiqomah">Istiqomah</span>`;
+                case 'Jenuh': return `<span class="badge badge-jenuh">Jenuh</span>`;
+                default: return `<span class="badge badge-baru">Baru</span>`;
+            }
+        }
+
+        // Detail History Global Access
+        window.showHistory = function(donatorId) {
+            const donator = allDonatorsData[donatorId];
+            if(!donator) return;
+            
+            const history = filteredDonations.filter(d => d.idDonatur === donatorId).sort((a,b) => new Date(b.tanggal) - new Date(a.tanggal));
+            const modalContainer = document.getElementById('modal-container');
+            const backdrop = document.getElementById('modal-backdrop');
+
+            modalContainer.innerHTML = `
+                <div class="flex justify-between items-center border-b pb-3 mb-4">
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-900">Riwayat Donasi</h3>
+                        <p class="text-sm text-gray-600">${donator.namaLengkap} (${donator.idDonatur})</p>
+                    </div>
+                    <button onclick="document.getElementById('modal-backdrop').classList.add('hidden')" class="text-gray-400 hover:text-gray-600">
+                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+                <div class="max-h-[60vh] overflow-y-auto pr-2">
+                    <ul class="space-y-3">
+                        ${history.map(t => `
+                            <li class="p-3 bg-gray-50 border rounded-lg">
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <p class="font-semibold text-gray-800">${t.program}</p>
+                                        <p class="text-xs text-gray-500">${t.tanggal} via ${t.namaCS || 'Sistem'}</p>
+                                    </div>
+                                    <p class="font-bold text-green-700">${formatCurrency(t.jumlah)}</p>
+                                </div>
+                            </li>
+                        `).join('')}
+                        ${history.length === 0 ? '<p class="text-center text-gray-500 text-sm">Belum ada transaksi.</p>' : ''}
+                    </ul>
+                </div>
+            `;
+            backdrop.classList.remove('hidden');
+            backdrop.classList.add('flex');
+        };
+
+        // Event Listener untuk Filter Tanggal
+        document.getElementById('btn-apply-filter').addEventListener('click', () => {
+            filterStartDate = document.getElementById('filter-start').value;
+            filterEndDate = document.getElementById('filter-end').value;
+            currentPage = 1;
+            applyFilterAndProcess();
+        });
+
+        document.getElementById('btn-reset-filter').addEventListener('click', () => {
+            document.getElementById('filter-start').value = '';
+            document.getElementById('filter-end').value = '';
+            filterStartDate = null;
+            filterEndDate = null;
+            currentPage = 1;
+            applyFilterAndProcess();
+        });
+
+        // Event Listener untuk Pengaturan Batas Jenuh
+        document.getElementById('btn-atur-jenuh').addEventListener('click', () => {
+            const modalContainer = document.getElementById('modal-container');
+            const backdrop = document.getElementById('modal-backdrop');
+
+            modalContainer.innerHTML = `
+                <div class="flex justify-between items-center border-b pb-3 mb-4">
+                    <h3 class="text-xl font-bold text-gray-900">Atur Batas Jenuh</h3>
+                    <button onclick="document.getElementById('modal-backdrop').classList.add('hidden')" class="text-gray-400 hover:text-gray-600">
+                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+                <div class="space-y-4">
+                    <p class="text-sm text-gray-600">Tentukan batas jumlah hari sejak donasi terakhir untuk mengkategorikan donatur sebagai <strong>Jenuh</strong>.</p>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Batas Hari</label>
+                        <div class="flex items-center gap-2">
+                            <input type="number" id="input-jenuh-threshold" value="${settingsJenuhThreshold}" min="1" class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 outline-none bg-gray-50">
+                            <span class="text-sm text-gray-500 font-medium">Hari</span>
+                        </div>
+                    </div>
+                    <button id="btn-save-jenuh" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-lg transition-colors shadow-sm">Simpan Perubahan</button>
+                </div>
+            `;
+            backdrop.classList.remove('hidden');
+            backdrop.classList.add('flex');
+
+            document.getElementById('btn-save-jenuh').addEventListener('click', () => {
+                const newVal = parseInt(document.getElementById('input-jenuh-threshold').value);
+                if(newVal > 0) {
+                    settingsJenuhThreshold = newVal;
+                    localStorage.setItem('jenuhThreshold', settingsJenuhThreshold);
+                    backdrop.classList.add('hidden');
+                    applyFilterAndProcess(); // Render ulang kategori dengan pengaturan baru
+                } else {
+                    alert("Masukkan angka yang valid (minimal 1 hari).");
+                }
+            });
+        });
+
+        // Event Listener untuk Tombol Pengaturan Tampilan
+        document.getElementById('btn-settings').addEventListener('click', () => {
+            const modalContainer = document.getElementById('modal-container');
+            const backdrop = document.getElementById('modal-backdrop');
+
+            modalContainer.innerHTML = `
+                <div class="flex justify-between items-center border-b pb-3 mb-4">
+                    <h3 class="text-xl font-bold text-gray-900">Pengaturan Tampilan</h3>
+                    <button onclick="document.getElementById('modal-backdrop').classList.add('hidden')" class="text-gray-400 hover:text-gray-600">
+                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Ukuran Font Keseluruhan</label>
+                        <div class="flex items-center gap-4 bg-gray-50 p-3 rounded-lg border border-gray-200 w-fit">
+                            <button type="button" id="btn-decrease-font" class="w-8 h-8 rounded bg-white border border-gray-300 hover:bg-gray-100 text-gray-700 font-bold flex items-center justify-center transition-colors shadow-sm" title="Perkecil Font">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path></svg>
+                            </button>
+                            <span id="font-size-display" class="text-base font-bold text-indigo-700 min-w-[3rem] text-center select-none">${currentFontSize}px</span>
+                            <button type="button" id="btn-increase-font" class="w-8 h-8 rounded bg-white border border-gray-300 hover:bg-gray-100 text-gray-700 font-bold flex items-center justify-center transition-colors shadow-sm" title="Perbesar Font">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                            </button>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2">Sesuaikan ukuran teks untuk kenyamanan membaca. Default: 12px.</p>
+                    </div>
+                </div>
+            `;
+            backdrop.classList.remove('hidden');
+            backdrop.classList.add('flex');
+
+            document.getElementById('btn-decrease-font').addEventListener('click', () => applyFontSize(currentFontSize - 1));
+            document.getElementById('btn-increase-font').addEventListener('click', () => applyFontSize(currentFontSize + 1));
+        });
+
+        // Event Listener untuk Tombol Sort
+        document.getElementById('btn-sort').addEventListener('click', () => {
+            const modalContainer = document.getElementById('modal-container');
+            const backdrop = document.getElementById('modal-backdrop');
+            const curSort = sortConfigs[currentView];
+            
+            let optionsHtml = '';
+            
+            if (currentView === 'transactions') {
+                optionsHtml = `
+                    <option value="tanggal-desc" ${curSort.key === 'tanggal' && curSort.order === 'desc' ? 'selected' : ''}>Tanggal (Terbaru)</option>
+                    <option value="tanggal-asc" ${curSort.key === 'tanggal' && curSort.order === 'asc' ? 'selected' : ''}>Tanggal (Terlama)</option>
+                    <option value="jumlah-desc" ${curSort.key === 'jumlah' && curSort.order === 'desc' ? 'selected' : ''}>Nominal (Tertinggi)</option>
+                    <option value="jumlah-asc" ${curSort.key === 'jumlah' && curSort.order === 'asc' ? 'selected' : ''}>Nominal (Terendah)</option>
+                `;
+            } else if (currentView === 'donators') {
+                optionsHtml = `
+                    <option value="totalDonasi-desc" ${curSort.key === 'totalDonasi' && curSort.order === 'desc' ? 'selected' : ''}>Akumulasi Donasi (Tertinggi)</option>
+                    <option value="totalDonasi-asc" ${curSort.key === 'totalDonasi' && curSort.order === 'asc' ? 'selected' : ''}>Akumulasi Donasi (Terendah)</option>
+                    <option value="donasiTerakhir-desc" ${curSort.key === 'donasiTerakhir' && curSort.order === 'desc' ? 'selected' : ''}>Tanggal Transaksi (Terbaru)</option>
+                    <option value="donasiTerakhir-asc" ${curSort.key === 'donasiTerakhir' && curSort.order === 'asc' ? 'selected' : ''}>Tanggal Transaksi (Terlama)</option>
+                `;
+            } else if (currentView === 'ranking') {
+                optionsHtml = `
+                    <option value="totalDonasi-desc" ${curSort.key === 'totalDonasi' && curSort.order === 'desc' ? 'selected' : ''}>Total Didonasikan (Tertinggi)</option>
+                    <option value="totalDonasi-asc" ${curSort.key === 'totalDonasi' && curSort.order === 'asc' ? 'selected' : ''}>Total Didonasikan (Terendah)</option>
+                    <option value="jumlahTransaksi-desc" ${curSort.key === 'jumlahTransaksi' && curSort.order === 'desc' ? 'selected' : ''}>Jumlah Transaksi (Terbanyak)</option>
+                    <option value="jumlahTransaksi-asc" ${curSort.key === 'jumlahTransaksi' && curSort.order === 'asc' ? 'selected' : ''}>Jumlah Transaksi (Tersedikit)</option>
+                `;
+            } else if (currentView === 'ranking-cs' || currentView === 'programs') {
+                optionsHtml = `
+                    <option value="total-desc" ${curSort.key === 'total' && curSort.order === 'desc' ? 'selected' : ''}>Total Dana (Tertinggi)</option>
+                    <option value="total-asc" ${curSort.key === 'total' && curSort.order === 'asc' ? 'selected' : ''}>Total Dana (Terendah)</option>
+                    <option value="trx-desc" ${curSort.key === 'trx' && curSort.order === 'desc' ? 'selected' : ''}>Jumlah Transaksi (Terbanyak)</option>
+                    <option value="trx-asc" ${curSort.key === 'trx' && curSort.order === 'asc' ? 'selected' : ''}>Jumlah Transaksi (Tersedikit)</option>
+                `;
+            }
+
+            modalContainer.innerHTML = `
+                <div class="flex justify-between items-center border-b pb-3 mb-4">
+                    <h3 class="text-xl font-bold text-gray-900">Urutkan Data</h3>
+                    <button onclick="document.getElementById('modal-backdrop').classList.add('hidden')" class="text-gray-400 hover:text-gray-600">
+                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Pilih Parameter Pengurutan:</label>
+                        <select id="input-sort-option" class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 outline-none bg-gray-50 text-gray-700">
+                            ${optionsHtml}
+                        </select>
+                    </div>
+                    <button id="btn-save-sort" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-lg transition-colors shadow-sm mt-4">Terapkan Urutan</button>
+                </div>
+            `;
+            backdrop.classList.remove('hidden');
+            backdrop.classList.add('flex');
+
+            document.getElementById('btn-save-sort').addEventListener('click', () => {
+                const selectedVal = document.getElementById('input-sort-option').value;
+                const [key, order] = selectedVal.split('-');
+                
+                sortConfigs[currentView] = { key, order };
+                currentPage = 1;
+                backdrop.classList.add('hidden');
+                renderTable(); 
+            });
+        });
+
+        // Pendaftaran Service Worker untuk PWA (Syarat wajib masuk App Drawer)
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                // Mencegah error 'URL protocol not supported' saat dijalankan di Canvas/Lokal
+                if (window.location.protocol === 'http:' || window.location.protocol === 'https:') {
+                    navigator.serviceWorker.register('./sw.js')
+                        .then(registration => {
+                            console.log('Service Worker berhasil didaftarkan dengan scope:', registration.scope);
+                        })
+                        .catch(err => {
+                            console.warn('Pendaftaran Service Worker gagal (Mungkin karena file sw.js tidak ditemukan di lingkungan ini):', err);
+                        });
+                } else {
+                    console.log('Pendaftaran Service Worker dilewati karena lingkungan saat ini tidak menggunakan protokol HTTP/HTTPS.');
+                }
+            });
+        }
+
+    </script>
+</body>
+</html>
